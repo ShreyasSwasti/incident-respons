@@ -79,6 +79,29 @@ function App() {
 
   const playbook = playbooks[incidentType];
 
+  const copyPlaybook = async () => {
+    const text = `
+Incident: ${incidentType}
+Severity: ${playbook.severity}
+Response Priority: ${playbook.priority}
+
+Description:
+${playbook.description}
+
+Response Steps:
+${playbook.steps
+  .map((step, index) => `${index + 1}. ${step}`)
+  .join('\n')}
+`;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('Playbook copied to clipboard!');
+    } catch (error) {
+      alert('Unable to copy the playbook.');
+    }
+  };
+
   return (
     <main className="app">
       <section className="card">
@@ -124,6 +147,10 @@ function App() {
 
           <p>{playbook.description}</p>
 
+          <button onClick={copyPlaybook}>
+            Copy Playbook
+          </button>
+
           <h2>Response Steps</h2>
 
           <ol>
@@ -138,4 +165,3 @@ function App() {
 }
 
 export default App;
-
