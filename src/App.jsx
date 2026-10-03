@@ -3,7 +3,9 @@ import { useState } from 'react';
 const playbooks = {
   DDoS: {
     severity: 'Critical',
-    description: 'Distributed traffic is overwhelming an application or network service.',
+    priority: 'Immediate Response',
+    description:
+      'Distributed traffic is overwhelming an application or network service.',
     steps: [
       'Confirm the traffic spike and identify the affected service.',
       'Check source IPs, request patterns, and traffic volume.',
@@ -15,7 +17,9 @@ const playbooks = {
 
   Malware: {
     severity: 'High',
-    description: 'Malicious software has been detected on a system or endpoint.',
+    priority: 'Urgent Response',
+    description:
+      'Malicious software has been detected on a system or endpoint.',
     steps: [
       'Isolate the affected device from the network.',
       'Identify the malware and affected files or processes.',
@@ -27,7 +31,9 @@ const playbooks = {
 
   Phishing: {
     severity: 'High',
-    description: 'A suspicious message or link may be attempting to steal credentials or information.',
+    priority: 'Urgent Response',
+    description:
+      'A suspicious message or link may be attempting to steal credentials or information.',
     steps: [
       'Identify the phishing message and affected users.',
       'Block the malicious sender, domain, or URL.',
@@ -39,7 +45,9 @@ const playbooks = {
 
   Ransomware: {
     severity: 'Critical',
-    description: 'Systems or files may have been encrypted or compromised by ransomware.',
+    priority: 'Immediate Response',
+    description:
+      'Systems or files may have been encrypted or compromised by ransomware.',
     steps: [
       'Immediately isolate affected systems from the network.',
       'Identify the scope of affected devices and files.',
@@ -51,7 +59,9 @@ const playbooks = {
 
   'Insider Threat': {
     severity: 'High',
-    description: 'Suspicious activity may originate from an authorized user or internal account.',
+    priority: 'Urgent Response',
+    description:
+      'Suspicious activity may originate from an authorized user or internal account.',
     steps: [
       'Identify the account and suspicious activity.',
       'Review authentication, access, and system logs.',
@@ -105,6 +115,11 @@ function App() {
               <span>Severity</span>
               <strong>{playbook.severity}</strong>
             </div>
+
+            <div>
+              <span>Response Priority</span>
+              <strong>{playbook.priority}</strong>
+            </div>
           </div>
 
           <p>{playbook.description}</p>
@@ -123,3 +138,4 @@ function App() {
 }
 
 export default App;
+
