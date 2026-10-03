@@ -76,3 +76,47 @@ select {
 .selected strong {
   font-size: 20px;
 }
+
+.playbook {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  background: #172033;
+}
+
+.playbook-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.playbook-header span {
+  display: block;
+  margin-bottom: 6px;
+  color: #94a3b8;
+}
+
+.playbook-header strong {
+  font-size: 18px;
+}
+
+.playbook p {
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.playbook h2 {
+  margin-top: 24px;
+  font-size: 20px;
+}
+
+.playbook ol {
+  padding-left: 24px;
+  color: #cbd5e1;
+}
+
+.playbook li {
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
