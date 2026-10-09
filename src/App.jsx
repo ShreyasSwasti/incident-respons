@@ -13,7 +13,6 @@ const playbooks = {
       'Monitor traffic until normal service is restored.',
     ],
   },
-
   Malware: {
     severity: 'High',
     description:
@@ -26,7 +25,6 @@ const playbooks = {
       'Monitor the system for signs of reinfection.',
     ],
   },
-
   Phishing: {
     severity: 'High',
     description:
@@ -39,7 +37,6 @@ const playbooks = {
       'Report the phishing indicators to the security team.',
     ],
   },
-
   Ransomware: {
     severity: 'Critical',
     description:
@@ -52,7 +49,6 @@ const playbooks = {
       'Restore systems only after the environment is confirmed safe.',
     ],
   },
-
   'Insider Threat': {
     severity: 'High',
     description:
@@ -102,6 +98,7 @@ function calculateSeverity(baseSeverity, affectedSystems) {
 function App() {
   const [incidentType, setIncidentType] = useState('DDoS');
   const [affectedSystems, setAffectedSystems] = useState('1');
+  const [completedSteps, setCompletedSteps] = useState([]);
   const [copyMessage, setCopyMessage] = useState('');
 
   const playbook = playbooks[incidentType];
@@ -120,6 +117,32 @@ function App() {
     systemCount >= 1 &&
     systemCount <= 100000;
 
+  const totalSteps = playbook.steps.length;
+  const completedCount = completedSteps.filter(Boolean).length;
+  const progress = Math.round(
+    (completedCount / totalSteps) * 100
+  );
+
+  const changeIncident = (newIncident) => {
+    setIncidentType(newIncident);
+    setCompletedSteps([]);
+    setCopyMessage('');
+  };
+
+  const toggleStep = (index) => {
+    setCompletedSteps((previous) =>
+      previous.map((done, stepIndex) =>
+        stepIndex === index ? !done : done
+      )
+    );
+    setCopyMessage('');
+  };
+
+  const resetChecklist = () => {
+    setCompletedSteps([]);
+    setCopyMessage('Checklist has been reset.');
+  };
+
   const copyPlaybook = async () => {
     if (!validInput) {
       setCopyMessage(
@@ -133,13 +156,17 @@ Incident: ${incidentType}
 Severity: ${severity}
 Response Priority: ${priority}
 Affected Systems: ${systemCount}
+Progress: ${completedCount}/${totalSteps} steps completed (${progress}%)
 
 Description:
 ${playbook.description}
 
-Response Steps:
+Response Checklist:
 ${playbook.steps
-  .map((step, index) => `${index + 1}. ${step}`)
+  .map(
+    (step, index) =>
+      `${completedSteps[index] ? '[x]' : '[ ]'} ${index + 1}. ${step}`
+  )
   .join('\n')}
 `;
 
@@ -161,8 +188,8 @@ ${playbook.steps
         <h1>Incident Response Playbook Generator</h1>
 
         <p className="description">
-          Generate a response workflow and assess incident
-          severity based on the affected systems.
+          Generate response workflows, assess severity, and
+          track incident response progress.
         </p>
 
         <label htmlFor="incident-type">Incident Type</label>
@@ -170,10 +197,7 @@ ${playbook.steps
         <select
           id="incident-type"
           value={incidentType}
-          onChange={(event) => {
-            setIncidentType(event.target.value);
-            setCopyMessage('');
-          }}
+          onChange={(event) => changeIncident(event.target.value)}
         >
           {incidentTypes.map((type) => (
             <option key={type} value={type}>
@@ -238,9 +262,69 @@ ${playbook.steps
 
           <p>{playbook.description}</p>
 
-          <button onClick={copyPlaybook} disabled={!validInput}>
-            Copy Playbook
-          </button>
+          <div className="checklist-header">
+            <h2>Response Checklist</h2>
+            <span>{completedCount}/{totalSteps} completed</span>
+          </div>
+
+          <div
+            className="progress-track"
+            role="progressbar"
+            aria-label="Response checklist progress"
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div
+              className="progress-fill"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+
+          <p className="progress-label">
+            {progress}% complete
+          </p>
+
+          <div className="checklist">
+            {playbook.steps.map((step, index) => (
+              <label
+                className={`checklist-item ${
+                  completedSteps[index] ? 'step-complete' : ''
+                }`}
+                key={step}
+              >
+                <input
+                  type="checkbox"
+                  checked={Boolean(completedSteps[index])}
+                  onChange={() => toggleStep(index)}
+                />
+                <span className="step-number">
+                  {index + 1}.
+                </span>
+                <span className="step-text">{step}</span>
+              </label>
+            ))}
+          </div>
+
+          {completedCount === totalSteps && (
+            <p className="completion-message" role="status">
+              All response steps have been marked complete.
+            </p>
+          )}
+
+          <div className="action-buttons">
+            <button onClick={copyPlaybook} disabled={!validInput}>
+              Copy Playbook
+            </button>
+
+            <button
+              className="reset-button"
+              onClick={resetChecklist}
+              disabled={completedCount === 0}
+            >
+              Reset Checklist
+            </button>
+          </div>
 
           {copyMessage && (
             <p className="copy-message" role="status">
@@ -248,18 +332,10 @@ ${playbook.steps
             </p>
           )}
 
-          <h2>Recommended Response Steps</h2>
-
-          <ol>
-            {playbook.steps.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-
           <p className="disclaimer">
-            Severity estimates are based on predefined rules.
-            Confirm severity using organizational incident
-            response policies and the actual business impact.
+            Severity estimates use predefined rules. Verify
+            incident severity and response actions against
+            organizational policies and actual business impact.
           </p>
         </div>
       </section>
