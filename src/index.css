@@ -1,3 +1,211 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.card {
+  width: 100%;
+  max-width: 700px;
+  padding: 40px;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  background: #1e293b;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #38bdf8;
+}
+
+h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.25;
+}
+
+.description {
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+label {
+  display: block;
+  margin: 24px 0 8px;
+  font-weight: bold;
+}
+
+select,
+input:not([type="checkbox"]) {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 16px;
+}
+
+select:focus,
+input:focus {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+.validation-message {
+  color: #fca5a5;
+  font-size: 14px;
+}
+
+.selected {
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #0f172a;
+}
+
+.selected span {
+  display: block;
+  margin-bottom: 6px;
+  color: #94a3b8;
+}
+
+.selected strong {
+  font-size: 20px;
+}
+
+.playbook {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  background: #172033;
+}
+
+.playbook-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.playbook-header span {
+  display: block;
+  margin-bottom: 8px;
+  color: #94a3b8;
+}
+
+.playbook-header strong {
+  font-size: 17px;
+}
+
+.severity {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.severity-low {
+  background: #14532d;
+  color: #bbf7d0;
+}
+
+.severity-medium {
+  background: #713f12;
+  color: #fde68a;
+}
+
+.severity-high {
+  background: #7f1d1d;
+  color: #fecaca;
+}
+
+.severity-critical {
+  background: #9f1239;
+  color: #ffe4e6;
+}
+
+.playbook p {
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.impact-summary {
+  margin-top: 24px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #0f172a;
+  font-size: 14px;
+}
+
+button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #0284c7;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #0369a1;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.copy-message {
+  font-size: 14px;
+  color: #7dd3fc !important;
+}
+
+.playbook h2 {
+  margin-top: 28px;
+  font-size: 20px;
+}
+
+.playbook ol {
+  padding-left: 24px;
+  color: #cbd5e1;
+}
+
+.playbook li {
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.disclaimer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #334155;
+  color: #94a3b8 !important;
+  font-size: 13px;
+}
+
+/* Incident response checklist */
+
 .checklist-header {
   display: flex;
   align-items: center;
@@ -119,6 +327,22 @@
 }
 
 @media (max-width: 600px) {
+  .app {
+    padding: 12px;
+  }
+
+  .card {
+    padding: 24px 18px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+
+  .playbook-header {
+    flex-direction: column;
+  }
+
   .checklist-header {
     align-items: flex-start;
     flex-direction: column;
