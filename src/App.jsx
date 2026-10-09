@@ -3,7 +3,6 @@ import { useState } from 'react';
 const playbooks = {
   DDoS: {
     severity: 'Critical',
-    priority: 'Immediate Response',
     description:
       'Distributed traffic is overwhelming an application or network service.',
     steps: [
@@ -17,7 +16,6 @@ const playbooks = {
 
   Malware: {
     severity: 'High',
-    priority: 'Urgent Response',
     description:
       'Malicious software has been detected on a system or endpoint.',
     steps: [
@@ -31,7 +29,6 @@ const playbooks = {
 
   Phishing: {
     severity: 'High',
-    priority: 'Urgent Response',
     description:
       'A suspicious message or link may be attempting to steal credentials or information.',
     steps: [
@@ -45,7 +42,6 @@ const playbooks = {
 
   Ransomware: {
     severity: 'Critical',
-    priority: 'Immediate Response',
     description:
       'Systems or files may have been encrypted or compromised by ransomware.',
     steps: [
@@ -59,7 +55,6 @@ const playbooks = {
 
   'Insider Threat': {
     severity: 'High',
-    priority: 'Urgent Response',
     description:
       'Suspicious activity may originate from an authorized user or internal account.',
     steps: [
@@ -74,16 +69,70 @@ const playbooks = {
 
 const incidentTypes = Object.keys(playbooks);
 
+const severityRank = {
+  Low: 1,
+  Medium: 2,
+  High: 3,
+  Critical: 4,
+};
+
+const responsePriorities = {
+  Low: 'Routine Response',
+  Medium: 'Elevated Response',
+  High: 'Urgent Response',
+  Critical: 'Immediate Response',
+};
+
+function calculateSeverity(baseSeverity, affectedSystems) {
+  let scaleSeverity = 'Low';
+
+  if (affectedSystems >= 100) {
+    scaleSeverity = 'Critical';
+  } else if (affectedSystems >= 20) {
+    scaleSeverity = 'High';
+  } else if (affectedSystems >= 5) {
+    scaleSeverity = 'Medium';
+  }
+
+  return severityRank[baseSeverity] >= severityRank[scaleSeverity]
+    ? baseSeverity
+    : scaleSeverity;
+}
+
 function App() {
   const [incidentType, setIncidentType] = useState('DDoS');
+  const [affectedSystems, setAffectedSystems] = useState('1');
+  const [copyMessage, setCopyMessage] = useState('');
 
   const playbook = playbooks[incidentType];
+  const systemCount = Number(affectedSystems);
+
+  const severity = calculateSeverity(
+    playbook.severity,
+    systemCount
+  );
+
+  const priority = responsePriorities[severity];
+
+  const validInput =
+    affectedSystems.trim() !== '' &&
+    Number.isInteger(systemCount) &&
+    systemCount >= 1 &&
+    systemCount <= 100000;
 
   const copyPlaybook = async () => {
+    if (!validInput) {
+      setCopyMessage(
+        'Enter a whole number between 1 and 100000.'
+      );
+      return;
+    }
+
     const text = `
 Incident: ${incidentType}
-Severity: ${playbook.severity}
-Response Priority: ${playbook.priority}
+Severity: ${severity}
+Response Priority: ${priority}
+Affected Systems: ${systemCount}
 
 Description:
 ${playbook.description}
@@ -96,9 +145,11 @@ ${playbook.steps
 
     try {
       await navigator.clipboard.writeText(text);
-      alert('Playbook copied to clipboard!');
-    } catch (error) {
-      alert('Unable to copy the playbook.');
+      setCopyMessage('Playbook copied successfully!');
+    } catch {
+      setCopyMessage(
+        'Unable to copy. Check browser clipboard permissions.'
+      );
     }
   };
 
@@ -110,7 +161,8 @@ ${playbook.steps
         <h1>Incident Response Playbook Generator</h1>
 
         <p className="description">
-          Select an incident type to generate a response workflow.
+          Generate a response workflow and assess incident
+          severity based on the affected systems.
         </p>
 
         <label htmlFor="incident-type">Incident Type</label>
@@ -118,7 +170,10 @@ ${playbook.steps
         <select
           id="incident-type"
           value={incidentType}
-          onChange={(event) => setIncidentType(event.target.value)}
+          onChange={(event) => {
+            setIncidentType(event.target.value);
+            setCopyMessage('');
+          }}
         >
           {incidentTypes.map((type) => (
             <option key={type} value={type}>
@@ -127,37 +182,85 @@ ${playbook.steps
           ))}
         </select>
 
+        <label htmlFor="affected-systems">
+          Number of Affected Systems
+        </label>
+
+        <input
+          id="affected-systems"
+          type="number"
+          min="1"
+          max="100000"
+          step="1"
+          value={affectedSystems}
+          onChange={(event) => {
+            setAffectedSystems(event.target.value);
+            setCopyMessage('');
+          }}
+          placeholder="Enter affected system count"
+        />
+
+        {!validInput && (
+          <p className="validation-message" role="alert">
+            Enter a whole number from 1 to 100000.
+          </p>
+        )}
+
         <div className="selected">
-          <span>Incident</span>
+          <span>Selected Incident</span>
           <strong>{incidentType}</strong>
         </div>
 
         <div className="playbook">
           <div className="playbook-header">
             <div>
-              <span>Severity</span>
-              <strong>{playbook.severity}</strong>
+              <span>Calculated Severity</span>
+              <strong className={`severity severity-${severity.toLowerCase()}`}>
+                {severity}
+              </strong>
             </div>
 
             <div>
               <span>Response Priority</span>
-              <strong>{playbook.priority}</strong>
+              <strong>{priority}</strong>
             </div>
           </div>
 
+          <p className="impact-summary">
+            {validInput
+              ? `${systemCount} system(s) affected. ${
+                  severity === playbook.severity
+                    ? 'The incident retains its baseline severity.'
+                    : `Severity has been escalated from ${playbook.severity} based on the affected system count.`
+                }`
+              : 'Enter a valid system count to assess the incident.'}
+          </p>
+
           <p>{playbook.description}</p>
 
-          <button onClick={copyPlaybook}>
+          <button onClick={copyPlaybook} disabled={!validInput}>
             Copy Playbook
           </button>
 
-          <h2>Response Steps</h2>
+          {copyMessage && (
+            <p className="copy-message" role="status">
+              {copyMessage}
+            </p>
+          )}
+
+          <h2>Recommended Response Steps</h2>
 
           <ol>
             {playbook.steps.map((step) => (
               <li key={step}>{step}</li>
             ))}
           </ol>
+
+          <p className="disclaimer">
+            Severity estimates are based on predefined rules.
+            Confirm severity using organizational incident
+            response policies and the actual business impact.
+          </p>
         </div>
       </section>
     </main>
