@@ -1,67 +1,92 @@
-# 🚨 Incident Response Playbook Generator & DDoS Request Monitor
+# Incident Response Playbook Generator
 
-## 🛡️ Overview
-This project is built as part of a cybersecurity hackathon. It is designed to generate a **step-by-step Incident Response (IR) playbook** based on the type of incident and associated log data. Additionally, it includes a **DDoS Request Monitoring System** that tracks incoming requests and automatically raises an alert when the threshold limit is exceeded.
+This is a cybersecurity project built to help users understand what to do when different types of security incidents happen. It generates response playbooks with useful steps that can help during incident handling.
 
----
+I built this project to learn more about cybersecurity and make incident response easier to understand.
 
-## ✨ Key Features
-- 🔐 **Login & Signup UI** with visual security shields and modern UI
-- 📄 **Incident Response Playbook Generator**
-  - Input: Incident type + log data
-  - Output: Step-by-step incident response instructions
-- 🚨 **DDoS Monitoring**
-  - Tracks number of incoming requests
-  - If requests > 300 → Alert popup & server offline
-  - If requests < 300 → Accept traffic normally
-- 📋 **Checklist-based IR workflow**
-- 🌐 **Frontend Built with React**
-- ☁️ **GitHub deployment & hosting Ready**
+## Features
 
----
+- **Incident Playbooks:** Generate response steps for different types of security incidents.
+- **Multiple Incident Types:** Supports DDoS, Malware, Phishing, Ransomware, and Insider Threats.
+- **Severity Assessment:** Shows the severity level of the selected incident.
+- **Response Checklist:** Mark completed steps and track your progress.
+- **Progress Tracking:** Displays the completion percentage of the checklist.
+- **DDoS Monitoring:** Includes a request monitoring concept with an alert threshold of more than 300 requests.
+- **Simple Interface:** Easy-to-use dashboard for exploring incident response steps.
 
-## 🏗️ Tech Stack
-| Component | Technology |
-|----------|------------|
-| Frontend UI | React.js / HTML / CSS / JavaScript |
-| Styling | Custom Components & Security Widgets |
-| Version Control | Git + GitHub |
-| Deployment | GitHub Pages / Vercel (future upgrade) |
+## Technologies Used
 
----
+- React
+- Vite
+- JavaScript
+- CSS
+- Tailwind CSS configuration
+- Framer Motion
+- Lucide React
 
-## 📌 Project Structure
+## Getting Started
 
----
+Follow these steps to run the project on your computer.
 
-## 🚀 How It Works (Flow)
-| Step | Description |
-|------|------------|
-| 1 | User logs in or creates an account |
-| 2 | Selects incident type (Malware, DDoS, Phishing, Ransomware, Insider Threat) |
-| 3 | Uploads or pastes logs |
-| 4 | System analyzes logs |
-| 5 | Generates step-by-step IR playbook |
-| 6 | Displays checklist for responders |
-| 7 | If DDoS Monitor active → auto threshold alert popup |
+### 1. Clone the repository
 
----
-
-## 🔧 Commands to Run Locally
 ```bash
-cd frontend
-npm install
-npm start
 git clone https://github.com/ShreyasSwasti/incident-respons.git
+```
 
----
-
-# 🎉 Done!
-You can now:
-## 1️⃣ Copy and paste this into README.md
-## 2️⃣ Commit and push:
+### 2. Open the project folder
 
 ```bash
-git add README.md
-git commit -m "Updated README documentation"
-git push
+cd incident-respons
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Start the development server
+
+```bash
+npm run dev
+```
+
+Open the local URL shown in your terminal to use the application.
+
+## Available Commands
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the development server |
+| `npm run build` | Build the project |
+| `npm run lint` | Check the code for linting issues |
+| `npm run preview` | Preview the production build |
+
+## How It Works
+
+1. Select an incident type from the available options.
+2. View the incident description and severity level.
+3. Follow the suggested response steps.
+4. Mark the completed steps in the checklist.
+5. Track your progress while working through the playbook.
+
+## Purpose
+
+The main goal of this project is to learn how incident response works and create a simple tool that organizes security response steps in one place.
+
+This project is for learning and demonstration purposes. The generated playbooks should be reviewed and adapted to the organization's actual incident response procedures before being used in real security incidents.
+
+## Future Improvements
+
+- Add more incident types and response playbooks.
+- Improve the monitoring dashboard.
+- Add incident history and reporting.
+- Include more security monitoring features.
+
+## Author
+
+**ShreyasSwasti**
+
+GitHub: [https://github.com/ShreyasSwasti](https://github.com/ShreyasSwasti)
+
