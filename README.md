@@ -35,9 +35,6 @@ git clone https://github.com/ShreyasSwasti/incident-respons.git
 ```
 
 ### 2. Open the project folder
-
-```bash
-cd incident-respons
 ```
 
 ### 3. Install dependencies
