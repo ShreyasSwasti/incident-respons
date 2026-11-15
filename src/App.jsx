@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 
 const playbooks = {
@@ -13,6 +14,7 @@ const playbooks = {
       'Monitor traffic until normal service is restored.',
     ],
   },
+
   Malware: {
     severity: 'High',
     description:
@@ -25,6 +27,7 @@ const playbooks = {
       'Monitor the system for signs of reinfection.',
     ],
   },
+
   Phishing: {
     severity: 'High',
     description:
@@ -37,6 +40,7 @@ const playbooks = {
       'Report the phishing indicators to the security team.',
     ],
   },
+
   Ransomware: {
     severity: 'Critical',
     description:
@@ -49,6 +53,7 @@ const playbooks = {
       'Restore systems only after the environment is confirmed safe.',
     ],
   },
+
   'Insider Threat': {
     severity: 'High',
     description:
@@ -118,7 +123,9 @@ function App() {
     systemCount <= 100000;
 
   const totalSteps = playbook.steps.length;
+
   const completedCount = completedSteps.filter(Boolean).length;
+
   const progress = Math.round(
     (completedCount / totalSteps) * 100
   );
@@ -129,12 +136,14 @@ function App() {
     setCopyMessage('');
   };
 
+  // Fixed: Checklist entries are now created and updated correctly.
   const toggleStep = (index) => {
-    setCompletedSteps((previous) =>
-      previous.map((done, stepIndex) =>
-        stepIndex === index ? !done : done
-      )
-    );
+    setCompletedSteps((previous) => {
+      const updated = [...previous];
+      updated[index] = !updated[index];
+      return updated;
+    });
+
     setCopyMessage('');
   };
 
@@ -197,7 +206,9 @@ ${playbook.steps
         <select
           id="incident-type"
           value={incidentType}
-          onChange={(event) => changeIncident(event.target.value)}
+          onChange={(event) =>
+            changeIncident(event.target.value)
+          }
         >
           {incidentTypes.map((type) => (
             <option key={type} value={type}>
@@ -239,7 +250,9 @@ ${playbook.steps
           <div className="playbook-header">
             <div>
               <span>Calculated Severity</span>
-              <strong className={`severity severity-${severity.toLowerCase()}`}>
+              <strong
+                className={`severity severity-${severity.toLowerCase()}`}
+              >
                 {severity}
               </strong>
             </div>
@@ -264,7 +277,9 @@ ${playbook.steps
 
           <div className="checklist-header">
             <h2>Response Checklist</h2>
-            <span>{completedCount}/{totalSteps} completed</span>
+            <span>
+              {completedCount}/{totalSteps} completed
+            </span>
           </div>
 
           <div
@@ -298,9 +313,11 @@ ${playbook.steps
                   checked={Boolean(completedSteps[index])}
                   onChange={() => toggleStep(index)}
                 />
+
                 <span className="step-number">
                   {index + 1}.
                 </span>
+
                 <span className="step-text">{step}</span>
               </label>
             ))}
@@ -313,7 +330,10 @@ ${playbook.steps
           )}
 
           <div className="action-buttons">
-            <button onClick={copyPlaybook} disabled={!validInput}>
+            <button
+              onClick={copyPlaybook}
+              disabled={!validInput}
+            >
               Copy Playbook
             </button>
 
