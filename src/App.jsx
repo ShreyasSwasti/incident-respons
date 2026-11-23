@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const playbooks = {
   DDoS: {
@@ -100,11 +100,36 @@ function calculateSeverity(baseSeverity, affectedSystems) {
     : scaleSeverity;
 }
 
+function formatTime(seconds) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  return [hours, minutes, remainingSeconds]
+    .map((value) => String(value).padStart(2, '0'))
+    .join(':');
+}
+
 function App() {
   const [incidentType, setIncidentType] = useState('DDoS');
   const [affectedSystems, setAffectedSystems] = useState('1');
   const [completedSteps, setCompletedSteps] = useState([]);
   const [copyMessage, setCopyMessage] = useState('');
+
+  // Incident timer states
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false);
+
+  // Timer functionality
+  useEffect(() => {
+    if (!timerRunning) return;
+
+    const interval = setInterval(() => {
+      setElapsedSeconds((previous) => previous + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timerRunning]);
 
   const playbook = playbooks[incidentType];
   const systemCount = Number(affectedSystems);
@@ -123,20 +148,27 @@ function App() {
     systemCount <= 100000;
 
   const totalSteps = playbook.steps.length;
-
   const completedCount = completedSteps.filter(Boolean).length;
 
   const progress = Math.round(
     (completedCount / totalSteps) * 100
   );
 
+  // Reset timer
+  const resetTimer = () => {
+    setTimerRunning(false);
+    setElapsedSeconds(0);
+  };
+
+  // Change incident type
   const changeIncident = (newIncident) => {
     setIncidentType(newIncident);
     setCompletedSteps([]);
     setCopyMessage('');
+    resetTimer();
   };
 
-  // Fixed: Checklist entries are now created and updated correctly.
+  // Toggle checklist
   const toggleStep = (index) => {
     setCompletedSteps((previous) => {
       const updated = [...previous];
@@ -147,11 +179,13 @@ function App() {
     setCopyMessage('');
   };
 
+  // Reset checklist
   const resetChecklist = () => {
     setCompletedSteps([]);
     setCopyMessage('Checklist has been reset.');
   };
 
+  // Copy playbook
   const copyPlaybook = async () => {
     if (!validInput) {
       setCopyMessage(
@@ -165,12 +199,15 @@ Incident: ${incidentType}
 Severity: ${severity}
 Response Priority: ${priority}
 Affected Systems: ${systemCount}
+Incident Response Time: ${formatTime(elapsedSeconds)}
+
 Progress: ${completedCount}/${totalSteps} steps completed (${progress}%)
 
 Description:
 ${playbook.description}
 
 Response Checklist:
+
 ${playbook.steps
   .map(
     (step, index) =>
@@ -275,6 +312,61 @@ ${playbook.steps
 
           <p>{playbook.description}</p>
 
+          {/* Incident Response Timer */}
+          <div className="incident-timer">
+            <h2>Incident Response Timer</h2>
+
+            <p className="timer-description">
+              Track the time spent handling this incident.
+            </p>
+
+            <div
+              className="timer-display"
+              role="timer"
+              aria-label={`Elapsed time ${formatTime(elapsedSeconds)}`}
+            >
+              {formatTime(elapsedSeconds)}
+            </div>
+
+            <div className="timer-buttons">
+              <button
+                type="button"
+                onClick={() => setTimerRunning(true)}
+                disabled={timerRunning}
+              >
+                Start
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTimerRunning(false)}
+                disabled={!timerRunning}
+              >
+                Pause
+              </button>
+
+              <button
+                type="button"
+                className="reset-button"
+                onClick={resetTimer}
+                disabled={
+                  elapsedSeconds === 0 && !timerRunning
+                }
+              >
+                Reset Timer
+              </button>
+            </div>
+
+            <p className="timer-status" role="status">
+              {timerRunning
+                ? 'Timer is running'
+                : elapsedSeconds > 0
+                  ? 'Timer paused'
+                  : 'Timer not started'}
+            </p>
+          </div>
+
+          {/* Response Checklist */}
           <div className="checklist-header">
             <h2>Response Checklist</h2>
             <span>
@@ -331,6 +423,7 @@ ${playbook.steps
 
           <div className="action-buttons">
             <button
+              type="button"
               onClick={copyPlaybook}
               disabled={!validInput}
             >
@@ -338,6 +431,7 @@ ${playbook.steps
             </button>
 
             <button
+              type="button"
               className="reset-button"
               onClick={resetChecklist}
               disabled={completedCount === 0}
