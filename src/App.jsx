@@ -68,8 +68,6 @@ const playbooks = {
   },
 };
 
-const incidentTypes = Object.keys(playbooks);
-
 const severityRank = {
   Low: 1,
   Medium: 2,
@@ -100,6 +98,20 @@ function calculateSeverity(baseSeverity, affectedSystems) {
     : scaleSeverity;
 }
 
+// Explain why an incident received its calculated severity
+function getSeverityExplanation(baseSeverity, affectedSystems) {
+  const calculatedSeverity = calculateSeverity(
+    baseSeverity,
+    affectedSystems
+  );
+
+  if (calculatedSeverity === baseSeverity) {
+    return `The incident retains its baseline severity of ${baseSeverity}. The affected system count does not require a higher severity level.`;
+  }
+
+  return `The baseline severity was ${baseSeverity}, but it increased to ${calculatedSeverity} because ${affectedSystems} systems are affected.`;
+}
+
 function formatTime(seconds) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -116,11 +128,10 @@ function App() {
   const [completedSteps, setCompletedSteps] = useState([]);
   const [copyMessage, setCopyMessage] = useState('');
 
-  // Incident timer states
+  // Incident timer
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
 
-  // Timer functionality
   useEffect(() => {
     if (!timerRunning) return;
 
@@ -131,21 +142,26 @@ function App() {
     return () => clearInterval(interval);
   }, [timerRunning]);
 
+  const incidentTypes = Object.keys(playbooks);
   const playbook = playbooks[incidentType];
+
   const systemCount = Number(affectedSystems);
-
-  const severity = calculateSeverity(
-    playbook.severity,
-    systemCount
-  );
-
-  const priority = responsePriorities[severity];
 
   const validInput =
     affectedSystems.trim() !== '' &&
     Number.isInteger(systemCount) &&
     systemCount >= 1 &&
     systemCount <= 100000;
+
+  const severity = validInput
+    ? calculateSeverity(playbook.severity, systemCount)
+    : playbook.severity;
+
+  const severityExplanation = validInput
+    ? getSeverityExplanation(playbook.severity, systemCount)
+    : 'Enter a valid number of affected systems to calculate severity.';
+
+  const priority = responsePriorities[severity];
 
   const totalSteps = playbook.steps.length;
   const completedCount = completedSteps.filter(Boolean).length;
@@ -188,9 +204,7 @@ function App() {
   // Copy playbook
   const copyPlaybook = async () => {
     if (!validInput) {
-      setCopyMessage(
-        'Enter a whole number between 1 and 100000.'
-      );
+      setCopyMessage('Enter a valid system count.');
       return;
     }
 
@@ -199,6 +213,7 @@ Incident: ${incidentType}
 Severity: ${severity}
 Response Priority: ${priority}
 Affected Systems: ${systemCount}
+Severity Explanation: ${severityExplanation}
 Incident Response Time: ${formatTime(elapsedSeconds)}
 
 Progress: ${completedCount}/${totalSteps} steps completed (${progress}%)
@@ -243,9 +258,7 @@ ${playbook.steps
         <select
           id="incident-type"
           value={incidentType}
-          onChange={(event) =>
-            changeIncident(event.target.value)
-          }
+          onChange={(event) => changeIncident(event.target.value)}
         >
           {incidentTypes.map((type) => (
             <option key={type} value={type}>
@@ -274,7 +287,7 @@ ${playbook.steps
 
         {!validInput && (
           <p className="validation-message" role="alert">
-            Enter a whole number from 1 to 100000.
+            Enter a whole number between 1 and 100000.
           </p>
         )}
 
@@ -300,15 +313,24 @@ ${playbook.steps
             </div>
           </div>
 
-          <p className="impact-summary">
-            {validInput
-              ? `${systemCount} system(s) affected. ${
-                  severity === playbook.severity
-                    ? 'The incident retains its baseline severity.'
-                    : `Severity has been escalated from ${playbook.severity} based on the affected system count.`
-                }`
-              : 'Enter a valid system count to assess the incident.'}
-          </p>
+          <div className="impact-summary">
+            <strong>Severity Assessment</strong>
+            <p>
+              Baseline Severity: {playbook.severity}
+            </p>
+            <p>
+              Affected Systems: {validInput ? systemCount : 'Invalid input'}
+            </p>
+            <p>
+              Final Severity: {severity}
+            </p>
+          </div>
+
+          {/* New Severity Explanation */}
+          <div className="severity-explanation">
+            <h3>Why this severity?</h3>
+            <p>{severityExplanation}</p>
+          </div>
 
           <p>{playbook.description}</p>
 
@@ -316,15 +338,7 @@ ${playbook.steps
           <div className="incident-timer">
             <h2>Incident Response Timer</h2>
 
-            <p className="timer-description">
-              Track the time spent handling this incident.
-            </p>
-
-            <div
-              className="timer-display"
-              role="timer"
-              aria-label={`Elapsed time ${formatTime(elapsedSeconds)}`}
-            >
+            <div className="timer-display">
               {formatTime(elapsedSeconds)}
             </div>
 
@@ -349,15 +363,13 @@ ${playbook.steps
                 type="button"
                 className="reset-button"
                 onClick={resetTimer}
-                disabled={
-                  elapsedSeconds === 0 && !timerRunning
-                }
+                disabled={elapsedSeconds === 0 && !timerRunning}
               >
                 Reset Timer
               </button>
             </div>
 
-            <p className="timer-status" role="status">
+            <p className="timer-status">
               {timerRunning
                 ? 'Timer is running'
                 : elapsedSeconds > 0
@@ -374,14 +386,7 @@ ${playbook.steps
             </span>
           </div>
 
-          <div
-            className="progress-track"
-            role="progressbar"
-            aria-label="Response checklist progress"
-            aria-valuenow={progress}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          >
+          <div className="progress-track">
             <div
               className="progress-fill"
               style={{ width: `${progress}%` }}
@@ -416,8 +421,8 @@ ${playbook.steps
           </div>
 
           {completedCount === totalSteps && (
-            <p className="completion-message" role="status">
-              All response steps have been marked complete.
+            <p className="completion-message">
+              All response steps have been marked complete!
             </p>
           )}
 
